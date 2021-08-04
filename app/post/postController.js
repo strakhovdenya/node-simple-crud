@@ -1,8 +1,8 @@
-const { PostsService } = require('./postsSerevice')
+import PostsService from './postsSerevice.js';
 
 const postsService = new PostsService();
 
-class PostController {
+export default class PostController {
     getAll() {
         return postsService.getAll();
     }
@@ -23,5 +23,3 @@ class PostController {
         return postsService.update(entity);
     }
 }
-
-exports.PostController = PostController;

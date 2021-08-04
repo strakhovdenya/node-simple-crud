@@ -1,8 +1,8 @@
-const { UsersService } = require('./usersServise.js')
+import UsersService from './usersServise.js';
 
 const usersService = new UsersService();
 
-class UserController {
+export default class UserController {
     getAll() {
         return usersService.getAll();
     }
@@ -23,5 +23,3 @@ class UserController {
         return usersService.update(entity);
     }
 }
-
-exports.UserController = UserController;

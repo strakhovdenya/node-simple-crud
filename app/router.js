@@ -1,9 +1,11 @@
-const { RouteEntity } = require('../libs/router/routeEntity.js');
-const { ParamsGetterFromPath } = require('../libs/router/paramsGetterFromPath');
+// const { RouteEntity } = require('../libs/router/routeEntity.js');
+// const { ParamsGetterFromPath } = require('../libs/router/paramsGetterFromPath');
+import RouteEntity from '../libs/router/routeEntity.js';
+import ParamsGetterFromPath from '../libs/router/paramsGetterFromPath.js';
 
 const paramsGetterFromPath = new ParamsGetterFromPath();
 
-class Router {
+export default class Router {
     constructor() {
         this.routs = [];
     }
@@ -91,4 +93,4 @@ class Router {
     }
 }
 
-exports.Router = Router;
+// exports.Router = Router;

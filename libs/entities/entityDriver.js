@@ -1,8 +1,12 @@
-const _ = require('lodash');
-const fs = require('fs');
+// import path from 'path';
+// import dotenv from 'dotenv';
+// dotenv.config({ path: "../.env" });
+
+import uniqueId from 'lodash/uniqueId.js';
+import fs from 'fs';
 
 
-class EntityDriver {
+export default class EntityDriver {
     constructor(entities) {   //конструктор создает файлы синхронно
         this.entities = entities;
         this.path = process.env.PATH_TO_DATA_FILE;
@@ -47,7 +51,7 @@ class EntityDriver {
                 const ids = data.map(el => el.id);
 
                 while (isIncludeId) {
-                    newId = _.uniqueId();
+                    newId = uniqueId();
                     isIncludeId = ids.includes(newId);
                 }
 
@@ -158,4 +162,3 @@ class EntityDriver {
         }
     }
 }
-exports.EntityDriver = EntityDriver;

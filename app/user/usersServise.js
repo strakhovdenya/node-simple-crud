@@ -1,9 +1,12 @@
-const { UserModel } = require('./userModel.js')
-const { UserIntutDto } = require('./userInputDto.js')
+import UserModel from './userModel.js';
+import UserIntutDto from './userInputDto.js';
 
 const userModule = new UserModel();
 
-class UsersService {
+export default class UsersService {
+    constructor(){
+        
+    }
     getAll() {
         return userModule.get();
     }
@@ -27,5 +30,3 @@ class UsersService {
         return userModule.update(entity);
     }
 }
-
-exports.UsersService = UsersService;

@@ -1,9 +1,9 @@
-const { PostModel } = require('./postModel.js');
-const { PostInputDto } = require('./postInputDto.js')
+import PostModel from './postModel.js';
+import PostInputDto from './postInputDto.js';
 
 const postModel = new PostModel();
 
-class PostsService {
+export default class PostsService {
     getAll() {
         return postModel.get();
     }
@@ -27,5 +27,3 @@ class PostsService {
         return postModel.update(entity);
     }
 }
-
-exports.PostsService = PostsService;

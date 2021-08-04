@@ -1,9 +1,13 @@
-const http = require('http');
-// import http from 'http'
-require('dotenv').config();
-const { Router } = require('./router.js');
-const { UserController } = require('../app/user/userController.js');
-const { PostController } = require('../app/post/postController.js');
+
+import 'dotenv/config';
+// require('dotenv').config();
+import http from 'http';
+
+
+import Router from './router.js';
+
+import UserController  from'./user/userController.js';
+import PostController  from'./post/postController.js';
 
 const router = new Router();
 const userController = new UserController();

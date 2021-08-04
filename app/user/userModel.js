@@ -1,8 +1,7 @@
-const { EntityDriver } = require('../../libs/entities/entityDriver');
-const constants = require('../../libs/constants.js');
+import EntityDriver from '../../libs/entities/entityDriver.js';
+import {constants}  from '../../libs/constants.js';
 
-
-class UserModel extends EntityDriver {
+export default class UserModel extends EntityDriver {
     constructor() {
         super([constants.USER_ENTITY]);
     }
@@ -24,5 +23,3 @@ class UserModel extends EntityDriver {
     }
 
 }
-
-exports.UserModel = UserModel;

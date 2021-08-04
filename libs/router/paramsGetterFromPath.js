@@ -1,4 +1,4 @@
-class ParamsGetterFromPath {
+export default class ParamsGetterFromPath {
     isRouteEqual(pathRoute, pathUrl) {
         const pathRoutParts = pathRoute.split('/');
         const pathUrlParts = pathUrl.split('/');
@@ -64,5 +64,3 @@ class ParamsGetterFromPath {
 
     }
 }
-
-exports.ParamsGetterFromPath = ParamsGetterFromPath;

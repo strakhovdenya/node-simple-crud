@@ -1,8 +1,8 @@
-const { EntityDriver } = require('../../libs/entities/entityDriver');
-const constants = require('../../libs/constants.js');
+import EntityDriver from '../../libs/entities/entityDriver.js';
+import {constants}  from '../../libs/constants.js';
 
 
-class PostModel extends EntityDriver {
+export default class PostModel extends EntityDriver {
     constructor() {
         super([constants.POST_ENTITY]);
     }
@@ -22,7 +22,4 @@ class PostModel extends EntityDriver {
     update(entity) {
         return super.update(constants.POST_ENTITY, entity)
     }
-
 }
-
-exports.PostModel = PostModel;
