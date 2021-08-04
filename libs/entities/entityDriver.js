@@ -26,7 +26,7 @@ export default class EntityDriver {
                 console.log(fileName, filePath);
                 console.log('exists: ' + fileName)
             } catch (err) {
-                await fsProm.writeFileSync(filePath, '');
+                await fsProm.writeFile(filePath, '');
                 console.log(fileName, filePath);
                 console.log('created: ' + fileName)
             }
