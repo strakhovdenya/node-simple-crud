@@ -1,0 +1,16 @@
+{
+  "name": "lecture7",
+  "version": "1.0.0",
+  "description": "lecture7 home task",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app/index.js"
+  },
+  "author": "Strakhov Denys",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "lodash": "^4.17.21"
+  }
+}
