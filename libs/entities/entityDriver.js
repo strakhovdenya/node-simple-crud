@@ -4,6 +4,7 @@
 
 import uniqueId from 'lodash/uniqueId.js';
 import fs from 'fs';
+import fsProm from 'fs/promises';
 
 
 export default class EntityDriver {
@@ -12,21 +13,25 @@ export default class EntityDriver {
         this.path = process.env.PATH_TO_DATA_FILE;
         this.fileExt = ".json";
 
-        fs.mkdirSync(this.path, { recursive: true })
+        
+    }
 
-        entities.map(entity => {
+    async init(){
+        await fsProm.mkdir(this.path, { recursive: true });
+
+        this.entities.map(async entity => {
             const [fileName, filePath] = this._getFileNameAndPath(entity);
-            console.log(fileName, filePath);
             try {
-                fs.readFileSync(filePath, '', { overwrite: false });
+                await fsProm.readFile(filePath, '', { overwrite: false });
+                console.log(fileName, filePath);
                 console.log('exists: ' + fileName)
             } catch (err) {
-                fs.writeFileSync(filePath, '');
+                await fsProm.writeFileSync(filePath, '');
+                console.log(fileName, filePath);
                 console.log('created: ' + fileName)
             }
         });
     }
-
 
     get(entityName, id) {
         return new Promise((resolve, reject) => {
