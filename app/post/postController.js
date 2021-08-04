@@ -1,26 +1,26 @@
-const { PostFetcher } = require('../../libs/servises/fetcherPosts')
+const { PostsService } = require('./postsSerevice')
 
-const postFetcher = new PostFetcher();
+const postsService = new PostsService();
 
 class PostController {
     getAll() {
-        return postFetcher.getAll();
+        return postsService.getAll();
     }
 
     get(id) {
-        return postFetcher.get(id);
+        return postsService.get(id);
     }
 
     delete(id) {
-        return postFetcher.delete(id);
+        return postsService.delete(id);
     }
 
     create(entity) {
-        return postFetcher.create(entity);
+        return postsService.create(entity);
     }
 
     update(entity) {
-        return postFetcher.update(entity);
+        return postsService.update(entity);
     }
 }
 

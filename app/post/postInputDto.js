@@ -1,9 +1,9 @@
 
-class Post {
+class PostInputDto {
     constructor(text, userId) {
         this.id = null
         this.text = text;
         this.userId = userId
     }
 }
-exports.Post = Post;
+exports.PostInputDto = PostInputDto;

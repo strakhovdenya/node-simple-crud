@@ -1,5 +1,5 @@
 
-class User {
+class UserIntutDto {
     constructor(name, age) {
         this.id = null
         this.name = name;
@@ -10,4 +10,4 @@ class User {
         }
     }
 }
-exports.User = User;
+exports.UserIntutDto = UserIntutDto;

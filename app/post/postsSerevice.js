@@ -1,9 +1,9 @@
-const { PostModel } = require('../../app/post/postModel.js');
-const { Post } = require('../entities/post.js')
+const { PostModel } = require('./postModel.js');
+const { PostInputDto } = require('./postInputDto.js')
 
 const postModel = new PostModel();
 
-class PostFetcher {
+class PostsService {
     getAll() {
         return postModel.get();
     }
@@ -17,15 +17,15 @@ class PostFetcher {
     }
 
     create(entityData) {
-        const entity = new Post(entityData.text, entityData.userId);
+        const entity = new PostInputDto(entityData.text, entityData.userId);
         return postModel.create(entity);
     }
 
     update(entityData) {
-        const entity = new Post(entityData.text, entityData.userId);
+        const entity = new PostInputDto(entityData.text, entityData.userId);
         entity.id = entityData.id;
         return postModel.update(entity);
     }
 }
 
-exports.PostFetcher = PostFetcher;
+exports.PostsService = PostsService;

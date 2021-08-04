@@ -1,26 +1,26 @@
-const { UserFetcher } = require('../../libs/servises/fetcherUsers.js')
+const { UsersService } = require('./usersServise.js')
 
-const userFetcher = new UserFetcher();
+const usersService = new UsersService();
 
 class UserController {
     getAll() {
-        return userFetcher.getAll();
+        return usersService.getAll();
     }
 
     get(id) {
-        return userFetcher.get(id);
+        return usersService.get(id);
     }
 
     delete(id) {
-        return userFetcher.delete(id);
+        return usersService.delete(id);
     }
 
     create(entity) {
-        return userFetcher.create(entity);
+        return usersService.create(entity);
     }
 
     update(entity) {
-        return userFetcher.update(entity);
+        return usersService.update(entity);
     }
 }
 

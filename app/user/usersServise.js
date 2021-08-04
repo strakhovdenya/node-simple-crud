@@ -1,9 +1,9 @@
-const { UserModel } = require('../../app/user/userModel.js')
-const { User } = require('../entities/user.js')
+const { UserModel } = require('./userModel.js')
+const { UserIntutDto } = require('./userInputDto.js')
 
 const userModule = new UserModel();
 
-class UserFetcher {
+class UsersService {
     getAll() {
         return userModule.get();
     }
@@ -17,15 +17,15 @@ class UserFetcher {
     }
 
     create(entityData) {
-        const entity = new User(entityData.name, entityData.age);
+        const entity = new UserIntutDto(entityData.name, entityData.age);
         return userModule.create(entity);
     }
 
     update(entityData) {
-        const entity = new User(entityData.name, entityData.age);
+        const entity = new UserIntutDto(entityData.name, entityData.age);
         entity.id = entityData.id;
         return userModule.update(entity);
     }
 }
 
-exports.UserFetcher = UserFetcher;
+exports.UsersService = UsersService;
