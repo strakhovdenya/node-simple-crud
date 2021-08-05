@@ -1,12 +1,11 @@
 import UserModel from './userModel.js';
+import PostModel from '../post/postModel.js';
 import UserIntutDto from './userInputDto.js';
 
 const userModule = new UserModel();
 
 export default class UsersService {
-    constructor(){
-        
-    }
+
     getAll() {
         return userModule.get();
     }
@@ -15,7 +14,14 @@ export default class UsersService {
         return userModule.get(id);
     }
 
-    delete(id) {
+    async delete(id) {
+        const postModel = new PostModel();
+        const posts = await postModel.get();
+        const userPosts = posts.filter(el => el.userId === id);
+        if (userPosts.length !== 0) {
+            throw new Error(`user with id: ${id} have ${userPosts.length} posts`);
+        }
+
         return userModule.delete(id);
     }
 
