@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs';
 import fsProm from 'fs/promises';
 
 
@@ -30,7 +29,7 @@ export default class EntityDriver {
 
     async get(entityName, id) {
         const [, filePath] = this._getFileNameAndPath(entityName);
-        const fileContent = await this.getFileContent(filePath);
+        const fileContent = await this._getFileContent(filePath);
 
         if (id) {
             return fileContent.filter(entityRecord => entityRecord.id === id)
@@ -39,34 +38,15 @@ export default class EntityDriver {
         return fileContent;
     }
 
-    async getFileContent(filePath) {
-        try {
-            const fileContent = await fsProm.readFile(filePath);
-            const fileContentNormalize = fileContent.toString() || '[]';
-
-            return JSON.parse(fileContentNormalize);
-        } catch (err) {
-            throw new Error(`Read file error: ${err.message}`);
-        }
-    }
-
-    async writeFileContent(filePath, fileContent) {
-        try {
-            await fsProm.writeFile(filePath, JSON.stringify(fileContent));
-        } catch (err) {
-            throw new Error(`Write file error: ${err.message}`);
-        }
-    }
-
     async create(entityName, entity) {
         const [, filePath] = this._getFileNameAndPath(entityName);
 
-        const fileContent = await this.getFileContent(filePath);
+        const fileContent = await this._getFileContent(filePath);
 
         entity.id = uuidv4();
         fileContent.push(entity);
 
-        await this.writeFileContent(filePath, fileContent);
+        await this._writeFileContent(filePath, fileContent);
 
         return entity;
     }
@@ -74,7 +54,7 @@ export default class EntityDriver {
     async delete(entityName, id) {
         const [, filePath] = this._getFileNameAndPath(entityName);
 
-        const fileContent = await this.getFileContent(filePath);
+        const fileContent = await this._getFileContent(filePath);
 
         const fileContentUpdated = fileContent.filter(entityRecord => entityRecord.id !== String(id));
         const isAbsent = fileContentUpdated.length === fileContent.length;
@@ -82,28 +62,33 @@ export default class EntityDriver {
             throw new Error(`record with id ${id} is absent in ${entityName}s`);
         }
 
-        await this.writeFileContent(filePath, fileContentUpdated);
+        await this._writeFileContent(filePath, fileContentUpdated);
 
         return `record with id ${id} is deleted`;
     }
 
-    update(entityName, entity) {
-        return new Promise((resolve, reject) => {
-            const fileDataHendler = (data) => {
-                const updatedData = data.map(element => {
-                    if (element.id === String(entity.id)) {
-                        element = entity;
-                    }
+    async update(entityName, entity) {
+        const [, filePath] = this._getFileNameAndPath(entityName);
 
-                    return element;
-                });
+        const fileContent = await this._getFileContent(filePath);
 
-                return updatedData;
-            };
+        const entityForUpdate = fileContent.filter(entityRecord => entityRecord.id === String(entity.id));
 
-            const callBackFileAction = this._fileWriter(resolve, reject, 'updat');
-            this._handleEntityData(entityName, fileDataHendler, callBackFileAction, reject);
-        })
+        if (entityForUpdate.length === 0) {
+            throw new Error(`record with id ${entity.id} is absent in ${entityName}s`);
+        }
+
+        const fileContentUpdated = fileContent.map(element => {
+            if (element.id === String(entity.id)) {
+                element = entity;
+            }
+
+            return element;
+        });
+
+        await this._writeFileContent(filePath, fileContentUpdated);
+
+        return entity;
     }
 
     _getFileNameAndPath(entity) {
@@ -116,52 +101,22 @@ export default class EntityDriver {
         ];
     }
 
-    _handleEntityData(entityName, fileDataHendler, callBackFileAction, reject) {
-        this.entities.filter(oneRecord => {
-            if (oneRecord === entityName) {
-                const [, filePath] = this._getFileNameAndPath(entityName);
+    async _getFileContent(filePath) {
+        try {
+            const fileContent = await fsProm.readFile(filePath);
+            const fileContentNormalize = fileContent.toString() || '[]';
 
-                fs.promises.readFile(filePath)
-                    .then(fileData => {
-
-                        fileData = bufferToString(fileData)
-
-                        let fileInfo = JSON.parse(fileData);
-
-                        const data = fileDataHendler(fileInfo);
-                        if (!data) {
-                            return;
-                        }
-
-                        callBackFileAction(data, entityName, filePath);
-                    })
-                    .catch(err => {
-                        reject(err);
-                    });
-            }
-        });
-
-        function bufferToString(fileData) {
-            fileData = fileData.toString();
-
-            if (!fileData) {
-                console.log(`no data in file "${entityName}"`);
-                fileData = "[]";
-            }
-
-            return fileData;
+            return JSON.parse(fileContentNormalize);
+        } catch (err) {
+            throw new Error(`Read file error: ${err.message}`);
         }
     }
 
-    _fileWriter(resolve, reject, action) {
-        return (data, entityName, filePath) => {
-            fs.promises.writeFile(filePath, JSON.stringify(data))
-                .then(() => {
-                    resolve(`entity is ${action}ed to "${entityName}"`);
-                })
-                .catch(err => {
-                    reject(`error ${action}ing to "${entityName}" ERROR:${err}`);
-                });
+    async _writeFileContent(filePath, fileContent) {
+        try {
+            await fsProm.writeFile(filePath, JSON.stringify(fileContent));
+        } catch (err) {
+            throw new Error(`Write file error: ${err.message}`);
         }
     }
 }
