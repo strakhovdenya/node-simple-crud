@@ -8,8 +8,6 @@ export default class EntityDriver {
         this.entities = entities;
         this.path = process.env.PATH_TO_DATA_FILE;
         this.fileExt = '.json';
-
-
     }
 
     async init() {
@@ -19,13 +17,9 @@ export default class EntityDriver {
             const [fileName, filePath] = this._getFileNameAndPath(entity);
             try {
                 await fsProm.readFile(filePath, '', { overwrite: false });
-                console.log(fileName, filePath);
-                console.log('exists: ' + fileName);
             } catch (err) {
                 try {
                     await fsProm.writeFile(filePath, '');
-                    console.log(fileName, filePath);
-                    console.log('created: ' + fileName);
                 } catch (err) {
                     throw new Error(`Creating DB file error: ${fileName} (${err.message})`);
                 }
@@ -77,22 +71,20 @@ export default class EntityDriver {
         return entity;
     }
 
-    delete(entityName, id) {
-        return new Promise((resolve, reject) => {
-            const fileDataHendler = (data) => {
-                const dataUpdated = data.filter(entityRecord => entityRecord.id !== String(id));
-                const isAbsent = dataUpdated.length === data.length;
-                if (isAbsent) {
-                    reject(`record with id ${id} is absent in ${entityName}`);
-                    return;
-                }
+    async delete(entityName, id) {
+        const [, filePath] = this._getFileNameAndPath(entityName);
 
-                return dataUpdated;
-            };
+        const fileContent = await this.getFileContent(filePath);
 
-            const callBackFileAction = this._fileWriter(resolve, reject, 'delet');
-            this._handleEntityData(entityName, fileDataHendler, callBackFileAction, reject);
-        })
+        const fileContentUpdated = fileContent.filter(entityRecord => entityRecord.id !== String(id));
+        const isAbsent = fileContentUpdated.length === fileContent.length;
+        if (isAbsent) {
+            throw new Error(`record with id ${id} is absent in ${entityName}s`);
+        }
+
+        await this.writeFileContent(filePath, fileContentUpdated);
+
+        return `record with id ${id} is deleted`;
     }
 
     update(entityName, entity) {
