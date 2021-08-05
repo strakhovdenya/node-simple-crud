@@ -30,13 +30,11 @@ export default class Router {
         req.url;
         req.method
         const rout = this.routs.filter(rout => {
-            return paramsGetterFromPath.isRouteEqual(rout.url, req.url) && rout.method === req.method
+            return paramsGetterFromPath.isRouteEqual(rout.url, req.url) && rout.method === req.method;
         })
 
         if (rout.length === 0) {
-            res.end(JSON.stringify({
-                data: '404!!!!!'
-            }));
+            res.end(JSON.stringify({ data: '404!!!!!'}));
             return;
         }
         const currentRout = rout[0]
@@ -76,21 +74,12 @@ export default class Router {
         })
     }
 
-    _fetchResponse(currentRout, res, params) {
-        currentRout.handler(...params)
-            .then(resp => {
-                return res.end(JSON.stringify({
-                    data: resp
-                }));
-            })
-            .catch(err => {
-                return res.end(JSON.stringify({
-                    error: err.toString()
-
-                }));
-
-            });
+    async _fetchResponse(currentRout, res, params) {
+        try {
+            const response = await currentRout.handler(...params);
+            res.end(JSON.stringify({ data: response }));
+        } catch (error) {
+            res.end(JSON.stringify({ error: error.message }));
+        }
     }
 }
-
-// exports.Router = Router;

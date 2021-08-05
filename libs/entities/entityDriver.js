@@ -1,22 +1,18 @@
-// import path from 'path';
-// import dotenv from 'dotenv';
-// dotenv.config({ path: "../.env" });
-
-import uniqueId from 'lodash/uniqueId.js';
+import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import fsProm from 'fs/promises';
 
 
 export default class EntityDriver {
-    constructor(entities) {   //конструктор создает файлы синхронно
+    constructor(entities) {
         this.entities = entities;
         this.path = process.env.PATH_TO_DATA_FILE;
-        this.fileExt = ".json";
+        this.fileExt = '.json';
 
-        
+
     }
 
-    async init(){
+    async init() {
         await fsProm.mkdir(this.path, { recursive: true });
 
         this.entities.map(async entity => {
@@ -24,51 +20,61 @@ export default class EntityDriver {
             try {
                 await fsProm.readFile(filePath, '', { overwrite: false });
                 console.log(fileName, filePath);
-                console.log('exists: ' + fileName)
+                console.log('exists: ' + fileName);
             } catch (err) {
-                await fsProm.writeFile(filePath, '');
-                console.log(fileName, filePath);
-                console.log('created: ' + fileName)
+                try {
+                    await fsProm.writeFile(filePath, '');
+                    console.log(fileName, filePath);
+                    console.log('created: ' + fileName);
+                } catch (err) {
+                    throw new Error(`Creating DB file error: ${fileName} (${err.message})`);
+                }
+
             }
         });
     }
 
-    get(entityName, id) {
-        return new Promise((resolve, reject) => {
-            const fileDataHendler = data => {
-                if (id) {
-                    const record = data.filter(entityRecord => entityRecord.id === id)
-                    resolve(record);
-                    return;
-                }
-                resolve(data);
-            }
-            const callBackFileAction = () => { };
-            this._handleEntityData(entityName, fileDataHendler, callBackFileAction, reject);
-        })
+    async get(entityName, id) {
+        const [, filePath] = this._getFileNameAndPath(entityName);
+        const fileContent = await this.getFileContent(filePath);
+
+        if (id) {
+            return fileContent.filter(entityRecord => entityRecord.id === id)
+        }
+
+        return fileContent;
     }
 
-    create(entityName, entity) {
-        return new Promise((resolve, reject) => {
-            const fileDataHendler = (data) => {
-                let newId = null;
-                let isIncludeId = true;
-                const ids = data.map(el => el.id);
+    async getFileContent(filePath) {
+        try {
+            const fileContent = await fsProm.readFile(filePath);
+            const fileContentNormalize = fileContent.toString() || '[]';
 
-                while (isIncludeId) {
-                    newId = uniqueId();
-                    isIncludeId = ids.includes(newId);
-                }
+            return JSON.parse(fileContentNormalize);
+        } catch (err) {
+            throw new Error(`Read file error: ${err.message}`);
+        }
+    }
 
-                entity.id = newId;
-                data.push(entity);
+    async writeFileContent(filePath, fileContent) {
+        try {
+            await fsProm.writeFile(filePath, JSON.stringify(fileContent));
+        } catch (err) {
+            throw new Error(`Write file error: ${err.message}`);
+        }
+    }
 
-                return data;
-            };
+    async create(entityName, entity) {
+        const [, filePath] = this._getFileNameAndPath(entityName);
 
-            const callBackFileAction = this._fileWriter(resolve, reject, 'add');
-            this._handleEntityData(entityName, fileDataHendler, callBackFileAction, reject);
-        });
+        const fileContent = await this.getFileContent(filePath);
+
+        entity.id = uuidv4();
+        fileContent.push(entity);
+
+        await this.writeFileContent(filePath, fileContent);
+
+        return entity;
     }
 
     delete(entityName, id) {
